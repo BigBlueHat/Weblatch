@@ -14,12 +14,17 @@ function(doc, req) {
   } else {
     // This section, more than any area will change based on the Webhook being
     // used with Weblatch.
-    // This first section handles Github's particular way of sending Webhooks.
-    if ('form' in req && 'payload' in req.form) {
-      // Github-style Webhook...with URI encoded payload...
-      new_doc = JSON.parse(decodeURIComponent(req.form.payload));
-    } else if ('form' in req) {
-      new_doc = req.form;
+    if ('form' in req) {
+      if ('payload' in req.form) {
+        // Github-style Webhook...with URI encoded payload...
+        new_doc = JSON.parse(decodeURIComponent(req.form.payload));
+      } else if ('mandrill_events' in req.form) {
+        // mandrillapp.com event handling
+        // https://mandrill.zendesk.com/hc/en-us/articles/205583287-Webhook-Format
+        new_doc['mandrill_events'] = JSON.parse(decodeURIComponent(req.form.mandrill_events));
+      } else {
+        new_doc = req.form;
+      }
     } else {
       // The `req.body` key contains anything that came in the body of the HTTP
       // request. Let's see if it's JSON first, and if it is, make that our
