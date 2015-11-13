@@ -18,6 +18,8 @@ function(doc, req) {
     if ('form' in req && 'payload' in req.form) {
       // Github-style Webhook...with URI encoded payload...
       new_doc = JSON.parse(decodeURIComponent(req.form.payload));
+    } else if ('form' in req) {
+      new_doc = req.form;
     } else {
       // The `req.body` key contains anything that came in the body of the HTTP
       // request. Let's see if it's JSON first, and if it is, make that our
